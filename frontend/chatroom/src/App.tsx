@@ -63,6 +63,8 @@ function App() {
 
   return (
     <div>
+      <div style={{ display: "flex", justifyContent: "center",   color: "#ffffff", fontWeight: "500", fontSize: "64px", textShadow: "3px 3px #646cffaa" }}> Vaartaalaap </div>
+      
       {/* <div>
         {allMessages.map((msg, idx) => {
           if (msg.val === "S"){
