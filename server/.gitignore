@@ -3,3 +3,4 @@ ws/dist
 http/node_modules
 http/dist
 chat.code-workspace
+.env 

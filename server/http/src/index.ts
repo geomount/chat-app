@@ -21,4 +21,6 @@ app.get("/", async (req, res) => {
     })
 })
 
-app.listen(PORT);
+app.listen(PORT, () => {
+    `HTTP server on PORT: ${PORT}`
+});

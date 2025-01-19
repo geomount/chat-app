@@ -13,12 +13,12 @@ function Auth (req: Request, res: Response, next: NextFunction) {
         } catch (error) {
             console.error(error);
             res.status(401);
-            throw new Error('Not authorized, token failed');
+            res.send('Not authorized, token failed');
 
         }
     } else {
         res.status(401);
-        throw new Error('Not authorized, no token');
+        res.send('Not authorized, no token');
     }
 }   
 
