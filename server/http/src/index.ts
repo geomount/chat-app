@@ -21,6 +21,33 @@ app.get("/", async (req, res) => {
     })
 })
 
+app.post("/signup", (req, res) => {
+    const username = req.body.username;
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password; 
+    const age = req.body.age;
+
+    // make DB call to check if username/email alr exists 
+    // to be done after deciding db 
+
+    res.send({
+        message: "SignUp Successful"
+    })
+})
+
+app.post("/signin", (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password; 
+
+    // make DB call to check if username and passwords are valid 
+    // set cookies here
+
+    res.send({
+        message: "SignIn Successful! Welcome User"
+    })
+})
+
 app.listen(PORT, () => {
     `HTTP server on PORT: ${PORT}`
 });
