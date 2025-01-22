@@ -1,8 +1,9 @@
-import express from 'express';
+import express, {Response, Request} from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 import path from "path";
 
 dotenv.config();
@@ -19,47 +20,116 @@ app.use(cors({
 }));
 
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
     
     res.send("Hello from the HTTP Server")
 })
 
-app.post("/signup", (req, res) => {
-    const username = req.body.username;
-    const name = req.body.name;
-    const email = req.body.email;
-    const password = req.body.password; 
-    const age = req.body.age;
+app.post("/signup", async (req: Request, res: Response): Promise<void> => {
 
-    // make DB call to check if username/email alr exists 
-    // to be done after deciding db 
+    try {
+        const {username, name, email, password, age} = req.body;
 
-    res.send({
-        message: "SignUp Successful"
-    })
+        if (!username || !name || !email || !password || !age) {
+            res.status(400).json({
+                message: "All fields are mandatory"
+            })
+            return 
+        }
+
+        const existingEmail = await User.findOne({where: email});
+        const existingUsername = await User.findOne({where: email});
+        if (existingEmail) {
+            res.status(400).json({
+                message: "Email already in use"
+            })
+            return 
+        }
+
+        if (existingUsername) {
+            res.status(400).json({
+                message: "Username already in use"
+            })
+            return 
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newUser = await UserActivation.create({
+            username,
+            name, 
+            email,
+            password: hashedPassword,
+            age
+        });
+
+        res.status(201).json({
+            message: "User Successfully created",
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                username: newUser.username, 
+                email: newUser.email,
+                age: newUser.age
+            }
+        })
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Server Error! Pls try again"
+        })
+        return 
+    }
+   
+
 })
 
-app.post("/signin", (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password; 
+app.post("/signin", async (req: Request, res: Response): Promise<void> => {
 
-    // make DB call to check if username and passwords are valid 
-    // set cookies here
-    // fetch id from db
-    const token = jwt.sign({
-        id: 1
-    }, JWT_SECRET);
-    res.cookie("token", token);
+    try {
+        const {username, password} = req.body;
 
-    res.send({
-        message: "SignIn Successful! Welcome User"
-    })
+        if (!username || !password) {
+            res.status(400).json({
+                message: "All fields are mandatory"
+            })
+            return 
+        }
+
+        const hashedPassword = bcrypt.hash(password, 10);
+
+        const user = await User.findOne({where: {username: username, password: hashedPassword}});
+
+        if (!user) {
+            res.status(400).json({
+                message: "Invalid Username or Password"
+            })
+            return 
+        }
+
+        const token = jwt.sign({
+            id: user.id
+        }, JWT_SECRET);
+
+        res.cookie("token", token);
+    
+        res.send({
+            message: "SignIn Successful! Welcome User"
+        })
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Server Error! Pls try again"
+        })
+        return 
+    }
+   
 })
 
-// app.get("/", async (req, res) => {
-//     res.sendFile(path.join(__dirname, "../../src/index.html"))
 
-// })
 
 app.listen(PORT, () => {
     `HTTP server on PORT: ${PORT}`
