@@ -28,7 +28,6 @@ app.get("/", (req: Request, res: Response) => {
 app.post("/signup", async (req: Request, res: Response): Promise<void> => {
 
     //ToDO: add zod schema
-    
     try {
         const {username, name, email, password, age} = req.body;
 
