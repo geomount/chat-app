@@ -11,7 +11,9 @@ interface UserI {
 }
 
 // Inefficent logic:
-// ToDo: Implement Queuing 
+// ToDo: Implement Queuing (Kafka? idk will have to read about it)
+
+// ToDO: Find some other way for Auth in WebSockets bc passing as query parameters isn't safe
 
 const users: UserI[] = [];
 
