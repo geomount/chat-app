@@ -15,6 +15,8 @@ interface UserI {
 
 // ToDO: Find some other way for Auth in WebSockets bc passing as query parameters isn't safe
 
+// Pass token through cookies
+
 const users: UserI[] = [];
 
 function checkUser(token: string): string | null {
