@@ -1,14 +1,29 @@
 import { WebSocketServer, WebSocket } from 'ws';
+import express, {Request} from 'express';
+import cookieParser from 'cookie-parser'
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import {JWT_SECRET} from process.env.JWT_SECRET;
+import {JWT_SECRET} from './config';
+import * as http from 'http';
 
-const wss = new WebSocketServer({ port: 8080 });
+
+const wss = new WebSocketServer({ noServer: true });
+
+interface RequestWithUser extends Request {
+  cookies: Record<string, string>;
+}
+
+interface ApplicationWithServer extends express.Application {
+  server?: http.Server;  // Adding server property of type http.Server
+}
 
 interface UserI {
   ws?: WebSocket,
   rooms: string[],
   userId: string
 }
+
+const app: ApplicationWithServer = express();
+app.use(cookieParser()); // To parse cookies
 
 // Inefficent logic:
 // ToDo: Implement Queuing (Kafka? idk will have to read about it)
@@ -42,14 +57,23 @@ function checkUser(token: string): string | null {
 
 }
 
-wss.on('connection', function connection(ws, request) {
+wss.on('connection', function connection(ws, request: RequestWithUser) {
 
-  const url = request.url;
+  // const url = request.url;
 
-  if (!url) return 
+  // if (!url) return 
 
-  const queryParameters = new URLSearchParams(url.split('?')[1]);
-  const token = queryParameters.get('token') ?? "";
+  // const queryParameters = new URLSearchParams(url.split('?')[1]);
+  // const token = queryParameters.get('token') ?? "";
+  // const userId = checkUser(token);
+
+  const token = request.cookies.token;
+
+  if (!token) {
+    ws.close(1008, 'No token provided');
+    return;
+  }
+
   const userId = checkUser(token);
 
   if (!userId || userId === null){
@@ -63,51 +87,62 @@ wss.on('connection', function connection(ws, request) {
     ws
     })
 
+});
 
-  ws.on('message', function message(data) {
+app.server = app.listen(8080, () => {
+  console.log('Server listening on port 8080');
+});
+
+app.server.on('upgrade', (req, socket, head) => {
+  // Make sure to include the cookies during WebSocket upgrade
+  wss.handleUpgrade(req, socket, head, (ws) => {
+    wss.emit('connection', ws, req);
+    ws.on('message', function message(data) {
     
-    const parsedData = JSON.parse(data as unknown as string);
-
-    if (parsedData.type === "join_room"){
-      const user = users.find(x => x.ws === ws)
-      const checkRoom = user?.rooms.filter(x => x === parsedData.roomId) || [];
-      console.log(checkRoom);
-      if (checkRoom?.length > 0){ 
-        ws.send("Already in the room")
-        return 
-      }
-      user?.rooms.push(parsedData.roomId)
-      ws.send("Welcome to the room")
-      return
-    }
-
-    if (parsedData.type === "leave_room") {
-      const user = users.find(x => x.ws === ws)
-      if (!user) {
-        return 
-      }
-      user.rooms = user?.rooms.filter(x => x === parsedData.roomId);
-    }
-
-    if (parsedData.type === "chat") {
-      const roomId = parsedData.roomId; 
-      const message = parsedData.message;
-
-      users.forEach(user => {
-        if (user.rooms.includes(roomId)) {
-          user.ws?.send(JSON.stringify({
-            type: "chat",
-            message: message, 
-            roomId: roomId
-          }))
+      const parsedData = JSON.parse(data as unknown as string);
+  
+      if (parsedData.type === "join_room"){
+        const user = users.find(x => x.ws === ws)
+        const checkRoom = user?.rooms.filter(x => x === parsedData.roomId) || [];
+        console.log(checkRoom);
+        if (checkRoom?.length > 0){ 
+          ws.send("Already in the room")
+          return 
         }
+        user?.rooms.push(parsedData.roomId)
+        ws.send("Welcome to the room")
+        return
       }
-      )
-
-    }
-
+  
+      if (parsedData.type === "leave_room") {
+        const user = users.find(x => x.ws === ws)
+        if (!user) {
+          return 
+        }
+        user.rooms = user?.rooms.filter(x => x === parsedData.roomId);
+      }
+  
+      if (parsedData.type === "chat") {
+        const roomId = parsedData.roomId; 
+        const message = parsedData.message;
+  
+        users.forEach(user => {
+          if (user.rooms.includes(roomId)) {
+            user.ws?.send(JSON.stringify({
+              type: "chat",
+              message: message, 
+              roomId: roomId
+            }))
+          }
+        }
+        )
+  
+      }
+  
+  
+    });
+  
+    ws.send('something');
 
   });
-
-  ws.send('something');
 });

@@ -5,9 +5,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import path from "path";
+import { JWT_SECRET } from './config';
 
-dotenv.config();
-const JWT_SECRET = process.env.JWT_SECRET as string;
 
 const app = express();
 const PORT = 3005;
