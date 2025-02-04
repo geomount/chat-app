@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import path from "path";
 import { JWT_SECRET } from './config';
+import { prismaClient } from './../../db/src/';
 
 
 const app = express();
@@ -28,17 +29,17 @@ app.post("/signup", async (req: Request, res: Response): Promise<void> => {
 
     //ToDO: add zod schema
     try {
-        const {username, name, email, password, age} = req.body;
+        const {username, email, password, age, photo} = req.body;
 
-        if (!username || !name || !email || !password || !age) {
+        if (!username || !email || !password || !age) {
             res.status(400).json({
                 message: "All fields are mandatory"
             })
             return 
         }
 
-        const existingEmail = await User.findOne({where: email});
-        const existingUsername = await User.findOne({where: email});
+        const existingEmail = await prismaClient.user.findFirst({where: email});
+        const existingUsername = await prismaClient.user.findFirst({where: email});
         if (existingEmail) {
             res.status(400).json({
                 message: "Email already in use"
@@ -55,19 +56,22 @@ app.post("/signup", async (req: Request, res: Response): Promise<void> => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const newUser = await UserActivation.create({
-            username,
-            name, 
-            email,
-            password: hashedPassword,
-            age
+        const newUser = await prismaClient.user.create({
+            data:{
+                username,
+                email,
+                password: hashedPassword,
+                age,
+                photo
+            }
+
         });
 
         res.status(201).json({
             message: "User Successfully created",
             user: {
                 id: newUser.id,
-                name: newUser.name,
+                photo: newUser.photo,
                 username: newUser.username, 
                 email: newUser.email,
                 age: newUser.age
@@ -90,7 +94,7 @@ app.post("/signup", async (req: Request, res: Response): Promise<void> => {
 app.post("/signin", async (req: Request, res: Response): Promise<void> => {
 
     try {
-        const {username, password} = req.body;
+        const {username, password}: {username: string, password: string} = req.body;
 
         if (!username || !password) {
             res.status(400).json({
@@ -99,9 +103,13 @@ app.post("/signin", async (req: Request, res: Response): Promise<void> => {
             return 
         }
 
-        const hashedPassword = bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.findOne({where: {username: username, password: hashedPassword}});
+        const user = await prismaClient.user.findFirst(
+            {where: {
+                username: username, 
+                password: hashedPassword
+            }});
 
         if (!user) {
             res.status(400).json({
