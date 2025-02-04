@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import path from "path";
 import { JWT_SECRET } from './config';
 import { prismaClient } from './../../db/src/';
+import { Auth } from './auth';
 
 
 const app = express();
@@ -18,6 +19,10 @@ app.use(cors({
     credentials: true,
     origin: "http://localhost:3000"
 }));
+
+interface RequestWithUser extends Request {
+    userId?: string 
+}
 
 
 app.get("/", (req: Request, res: Response) => {
@@ -137,6 +142,41 @@ app.post("/signin", async (req: Request, res: Response): Promise<void> => {
         return 
     }
    
+})
+
+
+app.post("/chatroom", Auth, async (req: RequestWithUser, res: Response) => {
+
+    const userId = req.userId; 
+
+    if (!userId) {
+        res.status(403).json({
+            message: "User does not exists! Please sign up again"
+        })
+        return
+    }
+
+    try {
+        const room = await prismaClient.room.create({
+            data: {
+                slug: req.body.name,
+                adminId: userId
+            }
+        })
+
+        res.json({
+            message: "Room Created Successfully",
+            roomId: room.id
+        })
+        return
+
+        } catch(e) {
+            res.status(411).json({
+                message: "Room with that slug already exists! Please use different slug"
+            })
+            return 
+        }
+
 })
 
 
