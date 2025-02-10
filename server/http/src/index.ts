@@ -11,8 +11,8 @@ import { Auth } from './auth';
 
 
 const app = express();
-const PORT = 3005;
 
+const PORT = 3005;
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
@@ -178,6 +178,8 @@ app.post("/chatroom", Auth, async (req: RequestWithUser, res: Response) => {
         }
 
 })
+
+
 
 
 app.get("/chats/:roomId", async (req: Request, res: Response) => {
