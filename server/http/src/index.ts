@@ -24,10 +24,10 @@ interface RequestWithUser extends Request {
     userId?: string 
 }
 
-
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response): void => {
     
     res.send("Hello from the HTTP Server")
+    return 
 })
 
 app.post("/signup", async (req: Request, res: Response): Promise<void> => {
