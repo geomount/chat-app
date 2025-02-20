@@ -10,8 +10,7 @@ function App() {
     val: string
   }
   const [allMessages, setAllMessages] = useState<Response []>([]);
-
-
+  const [roomId, setRoomId] = useState<string []>([]);
 
   function sendMessage(){
     if (!socket || !inputRef.current){
