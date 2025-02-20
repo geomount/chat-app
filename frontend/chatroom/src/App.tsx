@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import SignUpIn from './components/SignUpIn';
+import Avatars from './components/Avatars';
+import Rooms from './components/Rooms';
 import './App.css'
 
 function App() {
