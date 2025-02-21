@@ -1,121 +1,49 @@
-import { useEffect, useRef, useState } from 'react'
-import SignUpIn from './components/SignUpIn';
+import { useEffect, useRef, useState } from 'react';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';
 import Avatars from './components/Avatars';
 import Rooms from './components/Rooms';
+import { Button } from './components/Buttons';
 import './App.css'
 
 function App() {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [socket, setSocket] = useState<WebSocket | undefined>(undefined);
-  
-  interface Response {
-    message: string;
-    val: string
-  }
-  const [allMessages, setAllMessages] = useState<Response []>([]);
-  const [roomId, setRoomId] = useState<string []>([]);
-
-  function sendMessage(){
-    if (!socket || !inputRef.current){
-      return
-    }
-
-    const val = inputRef.current.value;
-
-    socket.send(JSON.stringify({
-      type: "chat",
-      payload: {
-        message: val
-      }
-    }));
-    inputRef.current.value = "";
-
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") sendMessage();
-  }
-
-  useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
-    setSocket(ws);
-
-    ws.onopen = () => {
-      ws.send(JSON.stringify({
-        type: "join",
-        payload: {
-          roomId: "red"
-        }
-      }))
-    }
-
-    ws.onmessage = (ev) => {
-      const data: string = ev.data;
-      const parsedData: Response = JSON.parse(data);
-
-      const obj: Response = {
-        message: parsedData.message,
-        val: parsedData.val
-      };
-    
-      setAllMessages((prevMessages) => [...prevMessages, obj])
-    }
-    
-  }, []);
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "center",   color: "#ffffff", fontWeight: "500", fontSize: "64px", textShadow: "3px 3px #646cffaa" }}> Vaartaalaap </div>
-      
-      {/* <div>
-        {allMessages.map((msg, idx) => {
-          if (msg.val === "S"){
-            return(
-              <div style={{ textAlign: "right" }}>
-                <strong>You:</strong> {msg.message}
+      <div className='bg-blue-300 h-screen flex flex-col'>
+        <div className='flex justify-center h-1/10 py-8'>
+          Vaartaalaap
+        </div>
+        <div className='grid grid-cols-2 gap-12 mx-72 p-4 h-8/10'>
+          <div>
+            <div className='flex justify-center px-8 py-24'>
+              Welcome! Connect with your homies over a chat! Ask that baddie out! Gossip about that bitch!
+            </div>
+            <div className='flex justify-between my-20'>
+              <div className='px-8'>
+                <Button disabled={true} onClick={
+                  () => {
+                    <Route path="/signin" element={<SignIn />}></Route>
+                  }}>SignIn</Button>
               </div>
-            );
-          } else {
-            return (
-              <div style={{ textAlign: "left" }}>
-                <strong>User:</strong> {msg.message}
+              <div className='px-8'>
+                <Button disabled={true} onClick={
+                  () => {
+                    <Route path="/signup" element={<SignUp />}></Route>
+                  }}>SignUp</Button>
               </div>
-            );
-          }
-
-        })}
-      </div> */}
-      <div style={{ display: "flex", flexDirection: "column", maxHeight: "400px", overflowY: "auto" }}>
-        {allMessages.map((msg, idx) => (
-          <div
-            key={`message-${idx}`}
-            style={{
-              display: "flex",
-              justifyContent: msg.val === "S" ? "flex-end" : "flex-start",
-              marginBottom: "10px",
-              maxWidth: "80%", // Maximum width of the message
-              alignSelf: msg.val === "S" ? "flex-end" : "flex-start", // Align sent messages to the right and received to the left
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: msg.val === "S" ? "#DCF8C6" : "#77CDFF", // Different background for sent/received
-                padding: "10px",
-                borderRadius: "10px",
-                maxWidth: "80%",
-                wordWrap: "break-word", 
-                textAlign: "left",
-                display: "inline-block",
-              }}
-            >
-              <strong>{msg.val === "S" ? "You" : "User"}:</strong> {msg.message}
             </div>
           </div>
-        ))}
-      </div>
+          <div className='flex justify-center items-center'>
+            Image
+          </div>
+        </div>
+        <div className='h-1/10 flex justify-center'>
+          Footer
+        </div>
 
-      <input type="text" placeholder='Enter your message' ref={inputRef} onKeyDown={handleKeyDown}></input>
-      <button onClick={sendMessage}> Send </button>
+      </div>
     </div>
   )
 }
