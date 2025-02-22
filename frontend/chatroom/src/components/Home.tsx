@@ -10,7 +10,8 @@ export default function Home() {
       <div className="grid grid-cols-2 gap-12 mx-72 p-4 h-8/10">
         <div>
           <div className="flex justify-center px-8 py-24">
-            Welcome! Connect with your homies over a chat!
+            <p> Welcome </p>
+            <p> Come chat with your homies! </p>
           </div>
           <div className="flex justify-between my-20">
             <div className="px-8">
