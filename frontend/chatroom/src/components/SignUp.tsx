@@ -1,14 +1,23 @@
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 
 const schema = z.object({
     username: z.string()
-        .min(3, 'Username must be at least 3 characters long'),
+        .min(3, 'Username must be at least 3 characters long')
+        .refine(async (u) => {
+            const response = await axios.get(`/api/v0/check-username?username=${u}`) as any;
+            return response.data.isUnique;
+            }, 'Username is already taken! Please choose something else'),
 
     email: z.string()
         .min(1, { message: "Please enter your email" })
-        .email("This is not a valid email."),
+        .email("This is not a valid email.")
+        .refine(async (e) => {
+            const response = await axios.get(`/api/v0/check-email?email=${e}`) as any;
+            return response.data.isUnique;
+            }, 'Email is already used! Please sign in'),
 
     photo: z.string().optional(),
 
