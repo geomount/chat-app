@@ -13,12 +13,12 @@ import { Auth } from './auth';
 const app = express();
 
 const PORT = 3005;
+
+app.use(cors());
+
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors({
-    credentials: true,
-    origin: "http://localhost:3000"
-}));
+
 
 interface RequestWithUser extends Request {
     userId?: string 
@@ -30,7 +30,7 @@ app.get("/", (req: Request, res: Response): void => {
     return 
 })
 
-app.post("/signup", async (req: Request, res: Response): Promise<void> => {
+app.post("/api/v0/signup", async (req: Request, res: Response): Promise<void> => {
 
     //ToDO: add zod schema
     try {
@@ -42,6 +42,8 @@ app.post("/signup", async (req: Request, res: Response): Promise<void> => {
             })
             return 
         }
+
+        console.log(username, email, password, age);
 
         const existingEmail = await prismaClient.user.findFirst({where: email});
         const existingUsername = await prismaClient.user.findFirst({where: email});
@@ -96,7 +98,7 @@ app.post("/signup", async (req: Request, res: Response): Promise<void> => {
 
 
 
-app.post("/signin", async (req: Request, res: Response): Promise<void> => {
+app.post("/api/v0/signin", async (req: Request, res: Response): Promise<void> => {
 
     try {
         const {username, password}: {username: string, password: string} = req.body;
@@ -145,7 +147,7 @@ app.post("/signin", async (req: Request, res: Response): Promise<void> => {
 })
 
 
-app.post("/chatroom", Auth, async (req: RequestWithUser, res: Response) => {
+app.post("/api/v0/chatroom", Auth, async (req: RequestWithUser, res: Response) => {
 
     const userId = req.userId; 
 
@@ -180,9 +182,7 @@ app.post("/chatroom", Auth, async (req: RequestWithUser, res: Response) => {
 })
 
 
-
-
-app.get("/chats/:roomId", async (req: Request, res: Response) => {
+app.get("/api/v0/chats/:roomId", async (req: Request, res: Response) => {
     const roomId = Number(req.params.roomId)
     const messages = await prismaClient.chat.findMany({
         where: {
@@ -196,6 +196,52 @@ app.get("/chats/:roomId", async (req: Request, res: Response) => {
 
     res.json({
         messages
+    })
+    return 
+})
+
+app.get("/api/v0/check-username/:username", async (req: Request, res: Response) => {
+    const checkUser = req.params.username;
+    const user = await prismaClient.user.findFirst(
+        {where: {
+            username: checkUser, 
+        }});
+
+    if (user) {
+        res.json({
+            message: "Username already exists! Please try something else",
+            isUnique: false
+        })
+        return 
+    }
+
+    res.json({
+        message: "Username is available",
+        isUnique: true
+    })
+    return 
+
+
+})
+
+app.get("/api/v0/check-email/:email", async (req: Request, res: Response) => {
+    const checkUser = req.params.email;
+    const user = await prismaClient.user.findFirst(
+        {where: {
+            email: checkUser, 
+        }});
+
+    if (user) {
+        res.json({
+            message: "Email already exists! Please Sign In",
+            isUnique: false
+        })
+        return 
+    }
+
+    res.json({
+        message: "Email is unique",
+        isUnique: true
     })
     return 
 })

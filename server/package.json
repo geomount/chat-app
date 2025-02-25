@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run --prefix http & npm run --prefix ws"
+    "dev": "concurrently \"npm run --prefix http dev\" \"npm run --prefix ws dev\""
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,7 @@
   "description": "",
   "devDependencies": {
     "@types/node": "^22.10.7",
+    "concurrently": "^9.1.2",
     "prisma": "^6.2.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
