@@ -2,22 +2,26 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+const backendLink = "http://localhost:3005";
+axios.defaults.withCredentials = true;
+
 
 const schema = z.object({
     username: z.string()
-        .min(3, 'Username must be at least 3 characters long')
-        .refine(async (u) => {
-            const response = await axios.get(`/api/v0/check-username?username=${u}`) as any;
-            return response.data.isUnique;
-            }, 'Username is already taken! Please choose something else'),
+        .min(3, 'Username must be at least 3 characters long'),
+        // .refine(async (u) => {
+        //     console.log("HI", u);
+        //     const response = await axios.get(backendLink + `/api/v0/check-username/${u}`) as any;
+        //     return !response.data.isUnique;
+        //     }, 'Username is already taken! Please choose something else'),
 
     email: z.string()
         .min(1, { message: "Please enter your email" })
-        .email("This is not a valid email.")
-        .refine(async (e) => {
-            const response = await axios.get(`/api/v0/check-email?email=${e}`) as any;
-            return response.data.isUnique;
-            }, 'Email is already used! Please sign in'),
+        .email("This is not a valid email."),
+        // .refine(async (e) => {
+        //     const response = await axios.get(backendLink + `/api/v0/check-email/${e}`) as any;
+        //     return !response.data.isUnique;
+        //     }, 'Email is already used! Please sign in'),
 
     photo: z.string().optional(),
 
@@ -42,7 +46,39 @@ export default function SignUp() {
         resolver: zodResolver(schema)
     });
 
-    const onSubmit = handleSubmit((data) => console.log(data))
+    const onSubmit = handleSubmit(async (data) => {
+        if (!data) {
+            return;
+        }
+    
+        try {
+            console.log(backendLink + "/api/v0/signup");
+    
+            const response = await fetch(backendLink + "/api/v0/signup", {
+                method: "POST",
+                body: JSON.stringify({
+                    username: data.username,
+                    password: data.password,
+                    email: data.email,
+                    age: data.age,
+                    photo: data.photo,
+                }),
+            });
+    
+            const responseData = await response.json(); // Parse the JSON response
+    
+            if (response.ok && responseData.success) {
+                console.log(responseData.message);
+            } else {
+                console.error('Please Sign Up again');
+            }
+    
+        } catch (err) {
+            console.error('Error during sign-up:', err);
+        }
+    });
+    
+
     return (
         <div className='flex justify-center items-center min-h-screen p-4 bg-black text-white'>
             <form onSubmit={onSubmit} className="bg-blue-400 rounded-lg shadow-lg p-8 max-w-md w-full text-black">

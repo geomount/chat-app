@@ -24,7 +24,28 @@ export default function SignIn() {
         resolver: zodResolver(schema)
     });
 
-    const onSubmit = handleSubmit((data) => console.log(data))
+    const onSubmit = handleSubmit(async (data) => {
+        if (!data) {
+            return;
+        }
+
+        try {
+            const response = await axios.post("http://localhost:3005/signin", {
+                username: data.username, 
+                password: data.password
+            }) as any;
+
+            if (response.data.success) {
+                localStorage.setItem('authToken', response.data.token);
+                window.location.href = '/home';
+              } else {
+                console.error('Invalid credentials')}
+
+        } catch (err) {
+            console.error('Error during sign-in:', err)
+        }
+    })
+
     return (
         <div className='flex justify-center items-center min-h-screen p-4 bg-black text-white'>
             <form onSubmit={onSubmit} className="bg-blue-400 rounded-lg shadow-lg p-8 max-w-md w-full text-black">

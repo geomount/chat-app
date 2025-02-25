@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"; 
 import { Button } from "./Buttons"; 
 
-export default function Home() {
+export default function LandingPage() {
   return (
     <div className="bg-blue-300 h-screen flex flex-col">
       <div className="flex justify-center h-1/10 py-8">
