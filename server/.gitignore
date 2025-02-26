@@ -2,6 +2,8 @@ ws/node_modules
 ws/dist
 http/node_modules
 http/dist
+db/node_modules
+db/dist
 chat.code-workspace
 node_modules
 .env 

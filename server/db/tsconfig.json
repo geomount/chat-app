@@ -1,6 +1,17 @@
 {
     "compilerOptions": {
-        "rootDir": "./src",
-        "outDir": "./dist"
-    }
-}
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "module": "commonjs",
+      "target": "ES6",
+      "paths": {
+        "db": ["../db/dist"]  // Point to the dist folder after compilation
+      },
+      "esModuleInterop": true,
+      "strict": true,
+      "composite": true  // Enable composite project for references
+    },
+    "include": ["src/**/*"],
+
+  }
+  

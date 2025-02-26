@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run --prefix http dev\" \"npm run --prefix ws dev\""
+    "dev": "npm run dev --prefix http && npm run dev --prefix ws"
   },
   "keywords": [],
   "author": "",

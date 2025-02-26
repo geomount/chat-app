@@ -1,4 +1,4 @@
-import express, {Response, Request} from 'express';
+import express, {Response, Request, NextFunction} from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -6,23 +6,45 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import path from "path";
 import { JWT_SECRET } from './config';
-import { prismaClient } from './../../db/src/';
 import { Auth } from './auth';
-
+import { prismaClient } from 'db';
 
 const app = express();
 
 const PORT = 3005;
 
-app.use(cors());
-
-app.use(cookieParser());
-app.use(express.json());
-
-
 interface RequestWithUser extends Request {
     userId?: string 
 }
+
+const corsOptions = {
+    origin: ['http://localhost:5173', 'http://192.168.149.51:5173'], // Specify origins correctly
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200,
+};
+  
+app.use(cors(corsOptions));
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.setHeader('Access-Control-Allow-Origin', 'http://192.168.149.51:5173');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200); // Respond immediately for OPTIONS requests
+        return 
+    }
+
+    next();
+});
+  
+app.use(cookieParser());
+app.use(express.json());
 
 app.get("/", (req: Request, res: Response): void => {
     
@@ -96,8 +118,6 @@ app.post("/api/v0/signup", async (req: Request, res: Response): Promise<void> =>
 
 })
 
-
-
 app.post("/api/v0/signin", async (req: Request, res: Response): Promise<void> => {
 
     try {
@@ -146,7 +166,6 @@ app.post("/api/v0/signin", async (req: Request, res: Response): Promise<void> =>
    
 })
 
-
 app.post("/api/v0/chatroom", Auth, async (req: RequestWithUser, res: Response) => {
 
     const userId = req.userId; 
@@ -180,7 +199,6 @@ app.post("/api/v0/chatroom", Auth, async (req: RequestWithUser, res: Response) =
         }
 
 })
-
 
 app.get("/api/v0/chats/:roomId", async (req: Request, res: Response) => {
     const roomId = Number(req.params.roomId)

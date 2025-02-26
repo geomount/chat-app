@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "composite": true,
+      "module": "commonjs",
+      "target": "ES6",
+      "esModuleInterop": true,
+      "strict": true
+    },
+    "include": [],
+    "references": [
+      { "path": "./db" },
+      { "path": "./http" },
+      { "path": "./ws" }
+    ]
+  }
+  
