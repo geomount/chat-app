@@ -1,17 +1,16 @@
 {
     "compilerOptions": {
-      "outDir": "./dist",
-      "rootDir": "./src",
+      "target": "ES2016",
       "module": "commonjs",
-      "target": "ES6",
-      "paths": {
-        "db": ["../db/dist"]  // Point to the dist folder after compilation
-      },
+    //   "declaration": true,        // Ensure this is enabled
+    //   "declarationMap": true,     // Optional, to create a map file for declarations
+      "outDir": "./dist",         // Output folder for compiled files
+      "rootDir": "./src",         // Root directory of your source files
       "esModuleInterop": true,
+      "skipLibCheck": true,
       "strict": true,
-      "composite": true  // Enable composite project for references
+      "composite": true
     },
-    "include": ["src/**/*"],
-
+    "include": ["src/**/*"]
   }
   

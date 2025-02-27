@@ -2,11 +2,12 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2016",
+    "baseUrl": "./src",         
     "outDir": "./dist",
     "rootDir": "./src",
     "esModuleInterop": true,
     "paths": {
-      "db": ["../db/src"]
+      "db": ["../db/dist"]
     },
     "composite": true,
     "strict": true

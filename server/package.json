@@ -2,10 +2,13 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run dev --prefix http && npm run dev --prefix ws"
-  },
+"scripts": {
+  "dev": "npm run build && npm run dev-http && npm run dev-ws",
+  "build": "tsc --build",
+  "dev-http": "npm run dev --prefix http",
+  "dev-ws": "npm run dev --prefix ws"
+},
+
   "keywords": [],
   "author": "",
   "license": "ISC",
