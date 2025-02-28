@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-const backendLink = "http://localhost:3005";
+const backendLink = "http://192.168.149.51:3005";
 axios.defaults.withCredentials = true;
 
 
