@@ -11,11 +11,11 @@ import { prismaClient } from 'db';
 
 const app = express();
 
-const PORT = 3005;
-
 interface RequestWithUser extends Request {
     userId?: string 
 }
+
+const PORT = 3005;
 
 const corsOptions = {
     origin: ['http://localhost:5173', 'http://192.168.149.51:5173'], // Specify origins correctly
