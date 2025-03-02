@@ -5,6 +5,8 @@ import axios from 'axios';
 const backendLink = "http://192.168.149.51:3005";
 axios.defaults.withCredentials = true;
 
+//Make Auth optional 
+
 
 const schema = z.object({
     username: z.string()
