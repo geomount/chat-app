@@ -4,7 +4,6 @@ import cookieParser from 'cookie-parser'
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import {JWT_SECRET} from './config';
 import * as http from 'http';
-// import { prismaClient } from './../../db/src/';
 
 
 const wss = new WebSocketServer({ noServer: true });

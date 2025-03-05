@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 import path from "path";
 import { JWT_SECRET } from './config';
 import { Auth } from './auth';
-import { prismaClient } from 'db';
+import { prismaClient } from '@repo/db/client'
 
 const app = express();
 

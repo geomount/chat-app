@@ -1,20 +1,30 @@
 {
-  "packageManager": "npm@11.1.0",
-  "devDependencies": {
-    "turbo": "^2.4.4"
-  },
   "name": "chatroom",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
     "turbo-linux-64": "^2.4.4"
   },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "turbo": "^2.4.4",
+    "typescript": "5.5.4"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "packageManager": "npm@11.1.0",
+  "engines": {
+    "node": ">=18"
   },
   "repository": {
     "type": "git",
